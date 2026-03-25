@@ -17,9 +17,13 @@ module.exports = {
   devtool: "inline-source-map",
   stats: "errors-only",
   devServer: {
-    static: path.resolve(__dirname, "./dist"),
-    port: 8080,
-    open: true,
+    static: {
+      directory: path.resolve(__dirname, "dist"), // ← this is the new property
+      // optional but recommended:
+      publicPath: "/",
+      serveIndex: true,
+    },
+    // ... other options like hot: true, port, etc.
   },
   target: ["web", "es5"],
   module: {
