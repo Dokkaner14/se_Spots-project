@@ -19,4 +19,4 @@ Api's
 
 [Link to project desciption video on LOOM](https://www.loom.com/share/487ff6e94c8643f4845a630aecc3d51f)
 
-[Link to the deployed projrect on GitHub](https://dokkaner14.github.io/se_project_spots/)
+[Link to the deployed project on GitHub](https://dokkaner14.github.io/se_project_spots/)
