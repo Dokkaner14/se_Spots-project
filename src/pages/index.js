@@ -14,7 +14,6 @@ import {
 import Api from "../utils/Api.js";
 
 // New Api //
-
 const api = new Api({
   baseUrl: "https://around-api.en.tripleten-services.com/v1",
   headers: {
@@ -43,7 +42,7 @@ const profileSubmitButton = document.querySelector(
   ".modal__submit_type_profile",
 );
 
-// edit form elements //
+// new post modal elements //
 const newPostModal = document.querySelector("#new-post-modal");
 const newCardFormElement = newPostModal.querySelector(".modal__form");
 const newCloseButton = newPostModal.querySelector(".modal__close");
@@ -193,18 +192,22 @@ function openModal(modal) {
 }
 
 function closeModal(modal) {
+  if (!modal) return;
+
   modal.classList.remove("modal_is-opened");
   document.removeEventListener("keydown", handleEscapeKey);
   modal.removeEventListener("click", handleOverlayClick);
+
+  // Only reset validation errors — do NOT reset form inputs when closing
   if (modal === editProfileModal) {
-    editProfileForm.reset();
     resetValidation(
       editProfileForm,
       [editProfileNameInput, editProfileDescriptionInput],
       config,
     );
   } else if (modal === newPostModal) {
-    newCardFormElement.reset();
+    // IMPORTANT: Do NOT reset newCardFormElement here
+    // Form should keep its state if closed without submitting
     resetValidation(newCardFormElement, [imageInput, captionInput], config);
   } else if (modal === avatarModal) {
     avatarForm.reset();
@@ -257,7 +260,6 @@ function handleAvatarSubmit(evt) {
       avatar: avatarInput.value,
     })
     .then((data) => {
-      avatarInput.value = data.avatar;
       avatarImage.src = data.avatar;
       renderButtonLoading(false);
       closeModal(avatarModal);
@@ -301,6 +303,7 @@ newCloseButton.addEventListener("click", function () {
 function handleAddCardSubmit(evt) {
   evt.preventDefault();
   renderButtonLoading(true);
+
   api
     .addCard({
       name: captionInput.value,
@@ -309,16 +312,21 @@ function handleAddCardSubmit(evt) {
     .then((data) => {
       const cardElement = getCardElement(data, api);
       cardsList.prepend(cardElement);
+
+      // Reset form ONLY after successful submission
       newCardFormElement.reset();
+      resetValidation(newCardFormElement, [imageInput, captionInput], config);
       disableButton(cardSubmitButton, config);
+
       renderButtonLoading(false);
       closeModal(newPostModal);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       renderButtonLoading(false);
     });
 }
+
 newCardFormElement.addEventListener("submit", handleAddCardSubmit);
 
 avatarButton.addEventListener("click", function () {
@@ -347,5 +355,3 @@ api
     });
   })
   .catch(console.error);
-
-enableValidation(config);
